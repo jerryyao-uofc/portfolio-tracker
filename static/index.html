@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio Overview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,520;9..144,640&family=Outfit:wght@380;500;640&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --card: #fffdf8;
+      --ink: #1d1a16;
+      --muted: #6f675c;
+      --line: #e3dacc;
+      --green: #157a43;
+      --green-soft: #e5f6eb;
+      --red: #b4232c;
+      --red-soft: #fdecea;
+      --shadow: 0 16px 40px rgba(60, 42, 20, 0.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 400px at 10% -10%, #efe4cf 0%, transparent 55%),
+        var(--bg);
+      font-family: Outfit, sans-serif;
+      font-weight: 380;
+    }
+    header, main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    header { padding: 32px 0 8px; display: flex; justify-content: space-between; gap: 24px; align-items: flex-end; }
+    .toolbar { display: flex; gap: 10px; align-items: center; }
+    h1, h2 { font-family: Fraunces, serif; font-weight: 520; letter-spacing: -0.03em; margin: 0; }
+    h1 { font-size: 42px; }
+    h2 { font-size: 28px; white-space: nowrap; }
+    .lede { color: var(--muted); margin: 6px 0 0; max-width: 560px; }
+    button {
+      font: inherit;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+    button:hover { border-color: #c9bfb0; }
+    nav { display: flex; gap: 8px; padding: 18px 0 6px; flex-wrap: wrap; }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+    nav a:hover { background: rgba(255,255,255,0.7); color: var(--ink); }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 14px 0 22px; }
+    #stats { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    #stats .card { min-width: 0; }
+    #stats .figure { white-space: nowrap; line-height: 1.05; }
+    .bar-row { display: grid; grid-template-columns: 88px 1fr 72px; gap: 10px; align-items: center; margin: 7px 0; font-size: 14px; }
+    .track { display: flex; height: 16px; background: #f3efe6; border-radius: 6px; overflow: hidden; }
+    .track i { display: block; height: 100%; }
+    .swatch.direct { background: #1d1a16; }
+    .swatch.via { background: #c9842a; }
+    .carousel { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; min-height: 88px; }
+    .carousel button { width: 40px; height: 40px; border-radius: 50%; }
+    .headline { font-family: Fraunces, serif; font-size: 26px; letter-spacing: -0.03em; line-height: 1.25; }
+    .ticker { color: var(--muted); font-family: Outfit, sans-serif; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+    .key span { display: inline-flex; gap: 6px; align-items: center; }
+    #outlook-stats { grid-template-columns: repeat(3, 1fr); }
+    .card { background: var(--card); border: 1px solid rgba(227, 218, 204, 0.9); border-radius: 18px; box-shadow: var(--shadow); padding: 18px 18px 16px; }
+    .label { color: var(--muted); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .figure { font-family: Fraunces, serif; font-size: 34px; margin-top: 6px; letter-spacing: -0.03em; }
+    .sub { margin-top: 4px; color: var(--muted); font-size: 14px; }
+    .up { color: var(--green); }
+    .down { color: var(--red); }
+    section { margin: 0 0 22px; }
+    .section-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; margin-bottom: 12px; }
+    .section-head p { margin: 0; color: var(--muted); flex: 1; min-width: 0; text-align: right; }
+    svg path, svg circle, .legend div { cursor: pointer; }
+    .tip {
+      position: fixed;
+      pointer-events: none;
+      background: #1d1a16;
+      color: #fffdf8;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      opacity: 0;
+      transform: translate(-50%, -130%);
+      z-index: 5;
+    }
+    #treemap { position: relative; height: 520px; border-radius: 18px; overflow: hidden; background: #241f1a; }
+    .tile { position: absolute; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 12px; color: white; border: 2px solid #241f1a; }
+    .tile strong { font-size: 16px; }
+    .tile span { font-size: 12px; opacity: 0.9; }
+    .pies { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; align-items: start; }
+    .ranges { display: flex; gap: 6px; }
+    .ranges button.on { background: var(--ink); color: var(--card); border-color: var(--ink); }
+    .legend { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .legend div { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center; font-size: 14px; }
+    .swatch { width: 12px; height: 12px; border-radius: 3px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; color: var(--muted); font-weight: 500; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); }
+    td.num, th.num { text-align: right; }
+    .note { color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .banner { background: #fff6e8; border: 1px solid #efd7b0; color: #6d4d1b; border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; }
+    .files { color: var(--muted); font-size: 13px; margin-top: 8px; }
+    footer { width: min(1180px, calc(100% - 40px)); margin: 8px auto 40px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    @media (max-width: 900px) {
+      .stats, .pies, #stats { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: flex-start; }
+      #treemap { height: 640px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Portfolio Overview</h1>
+      <p class="lede">Live prices for every CSV in the data folder. Green is up, red is down.</p>
+      <div class="files" id="files"></div>
+    </div>
+    <div class="toolbar">
+      <div class="ranges" id="currencies">
+        <button type="button" data-currency="USD" class="on">USD</button>
+        <button type="button" data-currency="SGD">SGD</button>
+        <button type="button" data-currency="CAD">CAD</button>
+        <button type="button" data-currency="CNY">RMB</button>
+      </div>
+      <button id="refresh" type="button">Refresh prices</button>
+    </div>
+  </header>
+  <main>
+    <nav>
+      <a href="#value">Value</a>
+      <a href="#stress">Drawdown risk</a>
+      <a href="#map">Allocation</a>
+      <a href="#mix">ETF and industry</a>
+      <a href="#news">News</a>
+      <a href="#holdings">Holdings</a>
+      <a href="#overlap">Look-through</a>
+      <a href="#outlook">Outlook</a>
+    </nav>
+    <div id="warnings"></div>
+    <div class="stats" id="stats"></div>
+
+    <section id="value">
+      <div class="section-head">
+        <h2 id="value-title">3 months</h2>
+        <div class="ranges" id="ranges">
+          <button type="button" data-range="7" onclick="setRange(7)">Past week</button>
+          <button type="button" data-range="30" onclick="setRange(30)">Past month</button>
+          <button type="button" data-range="92" class="on" onclick="setRange(92)">3 months</button>
+        </div>
+      </div>
+      <div class="card"><svg id="line" class="chart" role="img" aria-label="Portfolio value in US dollars"></svg></div>
+    </section>
+
+    <section id="stress">
+      <div class="section-head">
+        <h2>Drawdown risk</h2>
+        <p>Equities down 20% and crypto down 50%. Gold is left unchanged.</p>
+      </div>
+      <div id="stress-summary" class="stats"></div>
+    </section>
+
+    <section id="map">
+      <div class="section-head">
+        <h2>Allocation</h2>
+        <p>Area is the share of the portfolio. Color is today's move.</p>
+      </div>
+      <div id="treemap"></div>
+    </section>
+
+    <section id="mix">
+      <div class="section-head">
+        <h2>ETF and industry</h2>
+        <p>ETFs versus everything else, ETFs by region, then industries for the holdings that are not ETFs.</p>
+      </div>
+      <div class="pies">
+        <div class="card" id="etf-card"></div>
+        <div class="card" id="region-card"></div>
+        <div class="card" id="industry-card"></div>
+      </div>
+    </section>
+
+    <section id="news">
+      <div class="section-head">
+        <h2>In the news</h2>
+        <p>Headlines for the stocks you hold.</p>
+      </div>
+      <div class="card carousel" id="news-card">
+        <button type="button" id="news-prev" aria-label="Previous headline">‹</button>
+        <div id="news-slide"></div>
+        <button type="button" id="news-next" aria-label="Next headline">›</button>
+      </div>
+    </section>
+
+    <section id="holdings">
+      <div class="section-head">
+        <h2>Holdings</h2>
+        <p>Same prices as the charts above.</p>
+      </div>
+      <div class="card" style="overflow-x:auto"><table id="holdings-table"></table></div>
+    </section>
+
+    <section id="overlap">
+      <div class="section-head">
+        <h2 style="white-space:normal">Look-through, including shares inside ETFs</h2>
+        <p id="overlap-note"></p>
+      </div>
+      <div class="card" id="overlap-card"></div>
+    </section>
+
+    <section id="outlook">
+      <div class="section-head">
+        <h2>Ten, twenty, and thirty years</h2>
+        <p id="outlook-note"></p>
+      </div>
+      <div class="card">
+        <svg id="outlook-chart" class="chart" role="img" aria-label="Illustrated portfolio value in US dollars"></svg>
+        <div id="outlook-stats" class="stats" style="margin-top:8px"></div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    CSV columns: <code>asset_type</code>, <code>symbol</code>, <code>shares</code>, and optional <code>cost_per_share</code>.
+    Your positions are in <code>data/holdings.csv</code>. Prices come from Yahoo Finance and are cached for about a minute. The currency switch uses the latest US dollar, Singapore dollar, Canadian dollar, and Chinese yuan rates.
+    Crypto tickers such as BTC are read as BTC-USD. The long-range view compounds past annualized returns for the whole portfolio. It is not a forecast.
+  </footer>
+  <div class="tip" id="tip"></div>
+  <script>
+    const CURRENCIES = {
+      USD: { code: "USD", name: "US dollars" },
+      SGD: { code: "SGD", name: "Singapore dollars" },
+      CAD: { code: "CAD", name: "Canadian dollars" },
+      CNY: { code: "CNY", name: "Chinese yuan" },
+    };
+    let currency = "USD";
+    let rates = { USD: 1 };
+    const money = { format: value => formatMoney(value, 0) };
+    const moneyExact = { format: value => formatMoney(value, 2) };
+
+    function formatMoney(usd, digits) {
+      const rate = rates[currency] || 1;
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: CURRENCIES[currency].code,
+        maximumFractionDigits: digits,
+      }).format((usd || 0) * rate);
+    }
+
+    function currencyName() {
+      const rate = rates[currency];
+      if (currency === "USD" || !rate) return CURRENCIES[currency].name;
+      return `${CURRENCIES[currency].name} · 1 USD = ${rate.toFixed(4)}`;
+    }
+    const pct = new Intl.NumberFormat("en-US", { signDisplay: "exceptZero", minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const tip = document.getElementById("tip");
+    const PIE = ["#2f6f4e", "#c9842a", "#3d5a80", "#8c4a3a", "#6b705c", "#9a3d57", "#3f6f78", "#b08948", "#4c5c46", "#7d5a50", "#355c7d", "#a35d3a"];
+
+    function signedClass(value) { return value > 0 ? "up" : value < 0 ? "down" : ""; }
+    function signedText(value, formatter) {
+      const text = typeof formatter === "function" ? formatter(value) : formatter.format(value);
+      return `<span class="${signedClass(value)}">${text}</span>`;
+    }
+
+    function showTip(event, text) {
+      tip.textContent = text;
+      tip.style.left = event.clientX + "px";
+      tip.style.top = event.clientY + "px";
+      tip.style.opacity = "1";
+    }
+    function hideTip() { tip.style.opacity = "0"; }
+
+    function lineChart(svg, points, markers, options) {
+      const format = (options && options.format) || (value => money.format(value));
+      const forced = options && options.color;
+      svg.innerHTML = "";
+      if (!points.length) {
+        svg.innerHTML = `<text x="24" y="40" fill="#6f675c">No history yet.</text>`;
+        return;
+      }
+      const width = 1000;
+      const height = 320;
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      const values = points.map(point => point.value);
+      let min = Math.min(...values);
+      let max = Math.max(...values);
+      if (min === max) { min *= 0.98; max *= 1.02; }
+      const span = max - min;
+      min -= span * 0.08;
+      max += span * 0.08;
+      const labelText = [];
+      for (let step = 0; step <= 4; step += 1) labelText.push(format(min + (max - min) * (step / 4)));
+      let labelSize = 12;
+      const measure = () => {
+        let widest = 0;
+        labelText.forEach(text => {
+          const probe = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          probe.setAttribute("font-size", String(labelSize));
+          probe.setAttribute("font-family", "Outfit, sans-serif");
+          probe.textContent = text;
+          svg.appendChild(probe);
+          widest = Math.max(widest, probe.getComputedTextLength());
+          probe.remove();
+        });
+        return widest;
+      };
+      let widest = measure();
+      if (widest > 150) {
+        labelSize = 10;
+        widest = measure();
+      }
+      const pad = { l: Math.ceil(widest) + 16, r: 18, t: 18, b: 36 };
+      const x = index => pad.l + (index / (points.length - 1 || 1)) * (width - pad.l - pad.r);
+      const y = value => pad.t + (1 - (value - min) / (max - min)) * (height - pad.t - pad.b);
+      const rising = points[points.length - 1].value >= points[0].value;
+      const color = forced || (rising ? "#157a43" : "#b4232c");
+      for (let step = 0; step <= 4; step += 1) {
+        const value = min + (max - min) * (step / 4);
+        const yy = y(value);
+        svg.insertAdjacentHTML("beforeend", `<line x1="${pad.l}" y1="${yy}" x2="${width - pad.r}" y2="${yy}" stroke="#eee6da" />
+          <text x="${pad.l - 8}" y="${yy + 4}" text-anchor="end" fill="#6f675c" font-size="${labelSize}" font-family="Outfit, sans-serif">${format(value)}</text>`);
+      }
+      const coords = points.map((point, index) => [x(index), y(point.value)]);
+      const line = coords.map(pair => pair.join(",")).join(" ");
+      const area = `${pad.l},${height - pad.b} ${line} ${width - pad.r},${height - pad.b}`;
+      svg.insertAdjacentHTML("beforeend", `
+        <polygon points="${area}" fill="${color}" opacity="0.12"></polygon>
+        <polyline points="${line}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"></polyline>`);
+      (markers || []).forEach(marker => {
+        const index = points.findIndex(point => point.year === marker);
+        if (index < 0) return;
+        svg.insertAdjacentHTML("beforeend", `<circle cx="${x(index)}" cy="${y(points[index].value)}" r="5" fill="${color}"></circle>`);
+      });
+      const hit = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      hit.setAttribute("x", pad.l);
+      hit.setAttribute("y", pad.t);
+      hit.setAttribute("width", width - pad.l - pad.r);
+      hit.setAttribute("height", height - pad.t - pad.b);
+      hit.setAttribute("fill", "transparent");
+      hit.addEventListener("mousemove", event => {
+        const bounds = svg.getBoundingClientRect();
+        const ratio = (event.clientX - bounds.left) / bounds.width;
+        const local = ratio * width;
+        const index = Math.max(0, Math.min(points.length - 1, Math.round(((local - pad.l) / (width - pad.l - pad.r)) * (points.length - 1))));
+        const point = points[index];
+        const label = point.date || `Year ${point.year}`;
+        showTip(event, `${label}  ${format(point.value)}`);
+      });
+      hit.addEventListener("mouseleave", hideTip);
+      svg.appendChild(hit);
+    }
+
+    function layout(items, x, y, w, h, out) {
+      if (!items.length || w <= 0 || h <= 0) return;
+      if (items.length === 1) {
+        out.push({ ...items[0], x, y, w, h });
+        return;
+      }
+      const sum = items.reduce((total, item) => total + item.value, 0);
+      let running = 0;
+      let split = 1;
+      for (let index = 0; index < items.length - 1; index += 1) {
+        running += items[index].value;
+        split = index + 1;
+        if (running >= sum / 2) break;
+      }
+      const left = items.slice(0, split);
+      const right = items.slice(split);
+      const share = left.reduce((total, item) => total + item.value, 0) / sum;
+      if (w >= h) {
+        const width = w * share;
+        layout(left, x, y, width, h, out);
+        layout(right, x + width, y, w - width, h, out);
+      } else {
+        const height = h * share;
+        layout(left, x, y, w, height, out);
+        layout(right, x, y + height, w, h - height, out);
+      }
+    }
+
+    function tileColor(changePct) {
+      const amount = Math.max(-4, Math.min(4, changePct || 0)) / 4;
+      if (amount >= 0) {
+        const mix = amount;
+        const red = Math.round(58 + (21 - 58) * mix);
+        const green = Math.round(74 + (122 - 74) * mix);
+        const blue = Math.round(58 + (67 - 58) * mix);
+        return `rgb(${red}, ${green}, ${blue})`;
+      }
+      const mix = -amount;
+      const red = Math.round(92 + (168 - 92) * mix);
+      const green = Math.round(64 + (48 - 64) * mix);
+      const blue = Math.round(54 + (48 - 54) * mix);
+      return `rgb(${red}, ${green}, ${blue})`;
+    }
+
+    function drawTreemap(holdings) {
+      const host = document.getElementById("treemap");
+      host.innerHTML = "";
+      const width = host.clientWidth || 800;
+      const height = host.clientHeight || 520;
+      const boxes = [];
+      layout(holdings.map(item => ({ ...item })), 0, 0, width, height, boxes);
+      boxes.forEach(box => {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.style.left = box.x + "px";
+        tile.style.top = box.y + "px";
+        tile.style.width = box.w + "px";
+        tile.style.height = box.h + "px";
+        tile.style.background = tileColor(box.changePct);
+        if (box.w > 90 && box.h > 58) {
+          tile.innerHTML = `<strong>${box.symbol}</strong><span>${(box.weight * 100).toFixed(1)}% · ${pct.format(box.changePct || 0)}% today</span>`;
+        } else if (box.w > 48 && box.h > 32) {
+          tile.innerHTML = `<strong>${box.symbol}</strong>`;
+        }
+        tile.addEventListener("mousemove", event => {
+          showTip(event, `${box.name}  ${moneyExact.format(box.value)}  ${pct.format(box.changePct || 0)}% today`);
+        });
+        tile.addEventListener("mouseleave", hideTip);
+        host.appendChild(tile);
+      });
+    }
+
+    function escapeAttr(value) {
+      return String(value).replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
+    }
+
+    function escapeHtml(value) {
+      return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    }
+
+    function pie(slices) {
+      const total = slices.reduce((sum, slice) => sum + slice.value, 0) || 1;
+      let angle = -Math.PI / 2;
+      const paths = slices.map((slice, index) => {
+        const portion = slice.value / total;
+        const next = angle + portion * Math.PI * 2;
+        const large = portion > 0.5 ? 1 : 0;
+        const x1 = 100 + Math.cos(angle) * 78;
+        const y1 = 100 + Math.sin(angle) * 78;
+        const x2 = 100 + Math.cos(next) * 78;
+        const y2 = 100 + Math.sin(next) * 78;
+        const tipText = `${slice.label} · ${moneyExact.format(slice.value)} · ${(portion * 100).toFixed(1)}%`;
+        const path = slices.length === 1
+          ? `<circle cx="100" cy="100" r="78" fill="${PIE[index % PIE.length]}" data-tip="${escapeAttr(tipText)}"></circle>`
+          : `<path d="M100 100 L ${x1} ${y1} A 78 78 0 ${large} 1 ${x2} ${y2} Z" fill="${PIE[index % PIE.length]}" data-tip="${escapeAttr(tipText)}"></path>`;
+        angle = next;
+        return path;
+      }).join("");
+      const legend = slices.map((slice, index) => `
+        <div data-tip="${escapeAttr(`${slice.label} · ${moneyExact.format(slice.value)} · ${(slice.value / total * 100).toFixed(1)}%`)}"><i class="swatch" style="background:${PIE[index % PIE.length]}"></i><span>${slice.label}</span><strong>${(slice.value / total * 100).toFixed(1)}%</strong></div>
+      `).join("");
+      return `<svg viewBox="0 0 200 200" width="220" height="220">${paths}</svg><div class="legend">${legend}</div>`;
+    }
+
+    function render(data) {
+      rates = Object.assign({ USD: 1 }, data.fx || {});
+      document.querySelectorAll("#currencies button").forEach(button => {
+        button.classList.toggle("on", button.dataset.currency === currency);
+        button.disabled = button.dataset.currency !== "USD" && !rates[button.dataset.currency];
+      });
+      document.getElementById("files").textContent = data.files && data.files.length
+        ? `Files: ${data.files.join(", ")} · updated ${new Date(data.asOf).toLocaleString()}`
+        : "No CSV files found in the data folder.";
+      const warnings = document.getElementById("warnings");
+      warnings.innerHTML = (data.warnings || []).length
+        ? `<div class="banner">${data.warnings.map(item => `<div>${item}</div>`).join("")}</div>`
+        : "";
+      const totals = data.totals || {};
+      document.getElementById("stats").innerHTML = `
+        <div class="card"><div class="label">Total value</div><div class="figure">${moneyExact.format(totals.value || 0)}</div><div class="sub">${currencyName()}</div></div>
+        <div class="card"><div class="label">Today</div><div class="figure">${signedText(totals.dayChange || 0, moneyExact)}</div><div class="sub">${signedText(totals.dayChangePct || 0, value => pct.format(value) + "%")}</div></div>
+        <div class="card" id="period-card"></div>
+        <div class="card"><div class="label">Holdings</div><div class="figure">${(data.holdings || []).length}</div><div class="sub">${(data.holdings || []).filter(item => item.isEtf).length} ETFs</div></div>
+        <div class="card"><div class="label">Income</div><div class="figure">${moneyExact.format((data.income || {}).monthly || 0)}</div><div class="sub">a month · ${(((data.income || {}).yield || 0) * 100).toFixed(2)}% yield · stocks and ETFs, crypto excluded</div></div>`;
+
+      applyRange();
+      renderStress(data.stress || {});
+      startNews(data.news || []);
+      renderLookthrough(data.lookthrough || {});
+      drawTreemap(data.holdings || []);
+
+      document.getElementById("etf-card").innerHTML = `<div class="label">ETF versus the rest</div>${pie(data.etfSplit || [])}`;
+      const regions = data.regions || [];
+      document.getElementById("region-card").innerHTML = regions.length
+        ? `<div class="label">ETFs by region</div>${pie(regions)}`
+        : `<div class="label">ETFs by region</div><p class="note">None of the priced holdings are ETFs.</p>`;
+      const industries = data.industries || [];
+      document.getElementById("industry-card").innerHTML = industries.length
+        ? `<div class="label">Industries, excluding ETFs</div>${pie(industries)}`
+        : `<div class="label">Industries, excluding ETFs</div><p class="note">Every priced holding is an ETF, so this chart is empty.</p>`;
+
+      const inflationRate = (data.inflation || {})[currency];
+      const inflationLabel = inflationRate == null ? "2.5% a year" : `${(inflationRate * 100).toFixed(1)}% a year`;
+      document.getElementById("outlook-note").textContent =
+        `${data.projectionNote || ""} Shown in today's ${CURRENCIES[currency].name}, after removing average inflation of ${inflationLabel}.`;
+      const projection = (data.projections || []).map(point => ({
+        ...point,
+        value: point.value / ((1 + (inflationRate || 0.025)) ** point.year),
+      }));
+      lineChart(document.getElementById("outlook-chart"), projection.map(point => ({ ...point, date: null })), [10, 20, 30]);
+      const at = year => (projection.find(point => point.year === year) || {}).value;
+      const yearCard = (year) => `<div class="card"><div class="label">In ${year} years</div><div class="figure">${at(year) == null ? "—" : money.format(at(year))}</div><div class="sub">today's ${CURRENCIES[currency].name}</div></div>`;
+      document.getElementById("outlook-stats").innerHTML = yearCard(10) + yearCard(20) + yearCard(30);
+      const rows = data.holdings || [];
+
+      document.getElementById("holdings-table").innerHTML = `
+        <thead><tr><th>Symbol</th><th>Type</th><th>Industry</th><th class="num">Shares</th><th class="num">Price</th><th class="num">Today</th><th class="num">Value</th><th class="num">Weight</th></tr></thead>
+        <tbody>${rows.map(item => `<tr>
+          <td>${item.symbol}<div class="sub">${item.name}</div></td>
+          <td>${item.isEtf ? "ETF" : item.type}</td>
+          <td>${item.isEtf ? (item.region || "—") : item.industry}</td>
+          <td class="num">${item.shares}</td>
+          <td class="num">${moneyExact.format(item.price)}</td>
+          <td class="num">${signedText(item.changePct || 0, value => pct.format(value) + "%")}</td>
+          <td class="num">${moneyExact.format(item.value)}</td>
+          <td class="num">${(item.weight * 100).toFixed(1)}%</td>
+        </tr>`).join("")}</tbody>`;
+      requestAnimationFrame(fitStats);
+    }
+
+    function fitStats() {
+      document.querySelectorAll("#stats .figure").forEach(node => {
+        let size = 34;
+        node.style.fontSize = size + "px";
+        while (size > 16 && node.scrollWidth > node.clientWidth + 1) {
+          size -= 1;
+          node.style.fontSize = size + "px";
+        }
+      });
+    }
+
+    const RANGE_LABEL = { 7: "Past week", 30: "Past month", 92: "3 months" };
+    let rangeDays = 92;
+
+    function seriesForRange(series) {
+      if (!series.length) return [];
+      const end = series[series.length - 1].date;
+      const cutoff = new Date(end + "T00:00:00");
+      cutoff.setDate(cutoff.getDate() - rangeDays);
+      const start = cutoff.toISOString().slice(0, 10);
+      const sliced = series.filter(point => point.date >= start);
+      return sliced.length >= 2 ? sliced : series;
+    }
+
+    function renderStress(stress) {
+      const loss = stress.loss || 0;
+      document.getElementById("stress-summary").innerHTML = `
+        <div class="card"><div class="label">Stress loss</div><div class="figure down">${money.format(loss)}</div><div class="sub">${pct.format(stress.lossPct || 0)}% of the portfolio · ${currencyName()}</div></div>
+        <div class="card"><div class="label">Equities, −20%</div><div class="figure down">${money.format(stress.equityLoss || 0)}</div><div class="sub">Stocks and stock ETFs</div></div>
+        <div class="card"><div class="label">Crypto, −50%</div><div class="figure down">${money.format(stress.cryptoLoss || 0)}</div><div class="sub">${((stress.cryptoWeight || 0) * 100).toFixed(1)}% of value · ${((stress.cryptoLossShare || 0) * 100).toFixed(1)}% of this loss</div></div>`;
+    }
+
+    function renderLookthrough(look) {
+      document.getElementById("overlap-note").textContent = look.note || "";
+      const rows = look.rows || [];
+      const max = Math.max(...rows.map(row => row.total), look.unattributed || 0, 1);
+      const bar = (row) => {
+        const direct = row.direct / max * 100;
+        const via = row.insideEtf / max * 100;
+        return `<div class="bar-row"><strong>${row.symbol}</strong><div class="track" title="${row.name}"><i class="direct" style="width:${direct}%;background:#1d1a16"></i><i class="via" style="width:${via}%;background:#c9842a"></i></div><span>${(row.weight * 100).toFixed(1)}%</span></div>`;
+      };
+      const other = look.unattributed
+        ? `<div class="bar-row"><strong>Other</strong><div class="track"><i class="via" style="width:${look.unattributed / max * 100}%;background:#c9842a"></i></div><span>${((look.unattributedWeight || 0) * 100).toFixed(1)}%</span></div><div class="sub">Other holdings inside ETFs, beyond each fund's published top positions.</div>`
+        : "";
+      document.getElementById("overlap-card").innerHTML = `
+        <div class="key"><span><i class="swatch direct"></i> Held directly</span><span><i class="swatch via"></i> Inside ETFs</span></div>
+        ${rows.map(bar).join("")}
+        ${other}`;
+    }
+
+    let newsItems = [];
+    let newsIndex = 0;
+    let newsTimer = null;
+
+    function showNews() {
+      const host = document.getElementById("news-slide");
+      if (!newsItems.length) {
+        host.innerHTML = `<p class="note">No headlines for these stocks right now.</p>`;
+        return;
+      }
+      const item = newsItems[newsIndex % newsItems.length];
+      host.innerHTML = `<div class="ticker">${escapeHtml(item.symbol)} · ${newsIndex + 1} of ${newsItems.length}</div><div class="headline">${escapeHtml(item.title)}</div>`;
+    }
+
+    function stepNews(delta) {
+      if (!newsItems.length) return;
+      newsIndex = (newsIndex + delta + newsItems.length) % newsItems.length;
+      showNews();
+    }
+
+    function startNews(items) {
+      newsItems = items;
+      newsIndex = 0;
+      showNews();
+      if (newsTimer) clearInterval(newsTimer);
+      newsTimer = setInterval(() => stepNews(1), 5000);
+    }
+
+    function setRange(days) {
+      rangeDays = days;
+      applyRange();
+    }
+
+    function applyRange() {
+      if (!latest) return;
+      const series = seriesForRange(latest.series || []);
+      const label = RANGE_LABEL[rangeDays];
+      document.getElementById("value-title").textContent = label;
+      document.querySelectorAll("#ranges button").forEach(button => {
+        button.classList.toggle("on", Number(button.dataset.range) === rangeDays);
+      });
+      let change = null;
+      let changePct = null;
+      if (series.length >= 2 && series[0].value) {
+        change = series[series.length - 1].value - series[0].value;
+        changePct = change / series[0].value * 100;
+      }
+      document.getElementById("period-card").innerHTML = `
+        <div class="label">${label}</div>
+        <div class="figure">${change == null ? "—" : signedText(change, money)}</div>
+        <div class="sub">${changePct == null ? currencyName() : signedText(changePct, value => pct.format(value) + "%") + " · " + currencyName()}</div>`;
+      lineChart(document.getElementById("line"), series);
+    }
+
+    async function load(refresh) {
+      document.getElementById("refresh").disabled = true;
+      try {
+        const response = await fetch(refresh ? "/api/portfolio?refresh=1" : "/api/portfolio");
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not load the portfolio");
+        render(data);
+      } catch (error) {
+        document.getElementById("warnings").innerHTML = `<div class="banner">${error.message}</div>`;
+      } finally {
+        document.getElementById("refresh").disabled = false;
+      }
+    }
+
+    let latest = null;
+    const originalRender = render;
+    render = function (data) {
+      latest = data;
+      originalRender(data);
+    };
+    document.getElementById("refresh").addEventListener("click", () => load(true));
+    document.getElementById("news-prev").addEventListener("click", () => stepNews(-1));
+    document.getElementById("news-next").addEventListener("click", () => stepNews(1));
+    const newsCard = document.getElementById("news-card");
+    newsCard.addEventListener("mouseenter", () => { if (newsTimer) clearInterval(newsTimer); newsTimer = null; });
+    newsCard.addEventListener("mouseleave", () => { if (!newsTimer) newsTimer = setInterval(() => stepNews(1), 5000); });
+    document.addEventListener("mousemove", event => {
+      const node = event.target.closest("[data-tip]");
+      if (node) showTip(event, node.dataset.tip);
+    });
+    document.addEventListener("mouseout", event => {
+      if (event.target.closest && event.target.closest("[data-tip]")) hideTip();
+    });
+    document.getElementById("currencies").addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button || button.disabled) return;
+      currency = button.dataset.currency;
+      if (latest) render(latest);
+    });
+    document.getElementById("ranges").addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      setRange(Number(button.dataset.range));
+    });
+    window.addEventListener("resize", () => {
+      if (!latest) return;
+      drawTreemap(latest.holdings || []);
+      fitStats();
+    });
+    load(false);
+    setInterval(() => load(false), 60000);
+  </script>
+</body>
+</html>
