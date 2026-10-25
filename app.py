@@ -145,6 +145,9 @@ def load_holdings() -> tuple[list[dict], list[str], list[str]]:
         return [], [], [f"No data folder at {DATA_DIR}"]
 
     paths = sorted(DATA_DIR.glob("*.csv"))
+    local = sorted(DATA_DIR.glob("*.local.csv"))
+    if local:
+        paths = local
     if not paths:
         return [], [], ["Put one or more CSV files in the data folder."]
 

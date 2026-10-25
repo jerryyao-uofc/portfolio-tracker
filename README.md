@@ -35,7 +35,7 @@ On a Mac you can instead double-click **Portfolio Tracker.app** in this folder. 
 1. Copy `data/holdings.csv` or replace it.
 2. Keep the header row.
 3. Add one row per position. Extra CSV files in `data/` are added together. If the same symbol appears twice, the shares are summed.
-4. Save the file and click **Refresh prices** in the dashboard.
+4. Save the file and click **Refresh prices** in the dashboard. A file named `holdings.local.csv` is used instead of the sample, and that name is listed in `.gitignore` so it is not committed.
 
 | Column | Required | What to put |
 | --- | --- | --- |
